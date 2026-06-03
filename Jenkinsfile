@@ -13,10 +13,10 @@ pipeline {
             branch: 'main'
       }
     }
-    stage('Build') {
+    stage('Install & Test') {
       steps {
         sh 'npm install'
-        sh 'npm run build'
+        sh 'CI=true npm test'
       }
     }
     // stage('Archive') {
