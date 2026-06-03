@@ -60,7 +60,7 @@ pipeline {
           tools: [grype()],
           aggregatingResults: true,
           failedTotalHigh: 10, //fail if >=10 HIGHs
-          failedTotalAll : 20 //fail if >=20 issues in total
+          failedTotalAll: 20 //fail if >=20 issues in total
       )
     }
   }
