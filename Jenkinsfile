@@ -32,6 +32,11 @@ pipeline {
         }
       }
     }
+    stage('Analyze Image') {
+      steps {
+        sh "CI=true dive docker://${dockerImage.id}"
+      }
+    }
     stage("Push Image") {
       steps {
        script {
