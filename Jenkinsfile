@@ -35,6 +35,7 @@ pipeline {
     stage('Analyze Image') {
       steps {
         sh "CI=true dive docker://${dockerImage.id}"
+        grypeScan scanDest: "${dockerImage.id}", repName: 'myScanResult.txt', autoInstall:true
       }
     }
     stage("Push Image") {
@@ -51,7 +52,16 @@ pipeline {
       steps {
         sh "docker image prune --all --force --filter 'until=48h'"
       }
-
+    }
+  }
+  post {
+    always {
+      recordIssues(
+          tools: [grype()],
+          aggregatingResults: true,
+          failedTotalHigh: 10, //fail if >=10 HIGHs
+          failedTotalAll : 20 //fail if >=20 issues in total
+      )
     }
   }
 }
