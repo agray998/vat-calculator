@@ -30,7 +30,13 @@ pipeline {
             steps {
                 script {
                     dockerImage = docker.build(registry)
+                    dockerImage.tag("${env.BUILD_NUMBER}")
                 }
+            }
+        }
+        stage('Grype Scan') {
+            steps {
+                grypeScan scanDest: "docker:${registry}:${env.BUILD_NUMBER}", repName: "scanResult.txt", autoInstall: true
             }
         }
         stage('Push Image') {
@@ -49,4 +55,16 @@ pipeline {
             }
         }
     } 
+    post {
+        always {
+            recordIssues(
+                qualityGates: [
+                    [criticality: 'FAILURE', integerThreshold: 30, threshold: 30.0, type: 'TOTAL_HIGH'], 
+                    [criticality: 'FAILURE', integerThreshold: 5, threshold: 5.0, type: 'NEW']
+                    ], 
+                    sourceCodeRetention: 'LAST_BUILD', 
+                    tools: [grype()]
+            )
+        }
+    }
 }
